@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduApp</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/static/style.css">
+
+
+
+    <style>
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+            overflow: auto;
+        }
+        .footer-section {
+            margin-top: auto;
+        }
+
+
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 250px;
+            margin-bottom: 10px;
+        }
+
+        .custom-card {
+            color:black;
+            background-color:white;
+            transition: transform .5s, background-color .5s;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .custom-card:hover {
+            transform: scale(1.005);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+
+        .custom-card.correct {
+            background-color: green;
+        }
+
+        .custom-card.incorrect {
+            background-color: red;
+        }
+
+        .custom-card h3 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .custom-card p {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .scorecard {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+        ul li {
+            cursor: pointer;
+            list-style-type: none; /* Optional: removes the bullet points from list items */
+            padding: 5px 10px; /* Optional: adds some padding for better clickability and visual appeal */
+
+            margin-bottom: 5px; /* Optional: adds space between list items */
+            border-radius: 5px; /* Optional: rounds the corners of the list item borders */
+        }
+
+        ul li:hover {
+            background-color: #f0f0f0; /* Changes background color on hover for visual feedback */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <header>
+        <nav class="nav-bar">
+            <div class="logo">
+                <img class="star" src="/static/img/Logo.png" alt="" style="width:25px;">
+                <div style="font-size:25px;"><a href="/" style="font-size:25px;text-decoration:none;">EduApp</a></div>
+            </div>
+            <ul class="menu-items">
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'speech_to_text' %}" style="background-color: transparent;text-decoration:none">Audio</a></li>
+                    <li><a href="{% url 'subject_based_notes' %}" style="background-color: transparent;text-decoration:none">Ai Notes</a></li>
+                    <li><a href="{% url 'dashboard' %}" style="background-color: transparent;text-decoration:none">Dashboard</a></li>
+                {%else%}
+                    <li><a href="{% url 'login' %}">Audio</a></li>
+                    <li><a href="{% url 'login' %}">Ai Notes</a></li>
+                    <li><a href="{% url 'login' %}">Dashboard</a></li>
+                {%endif%}
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration:none;color:white">
+                          {{ request.user }} <b class="caret"></b>
+                      </a>
+                      <ul class="dropdown-menu">
+                          <li style="color:black"><a href="{% url 'logout' %}" style="color:black;text-decoration:none;padding-left:20px;">Logout</a></li>
+                      </ul>
+                    </li>
+                {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+<!--                <li><a href="{% url 'logout' %}">{{request.user}}</a></li>-->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+    <section class="section-one">
+        <div class="container">
+            <div class="left-side">
+                <div class="title">
+                    <h1>All Notes
+                         <img src="/static/img/star.png" alt="" class="star">
+                          <br> EduApp, where AI turns audio into actionable notes and quizzes</h1>
+                </div>
+
+                <p class="p">
+                    Smarter Study Sessions Await: Dive into EduApp's AI notes and quizzes for smarter, faster learning.
+                </p>
+
+            </div>
+            <div class="right-side pyramid">
+                <img src="/static/img/gold.png" alt="" class="gold glow image">
+            </div>
+        </div>
+    </section>
+
+        <div class="container-fluid" style="margin:5%">
+    <!-- Subject Dropdown -->
+    <select id="subject-dropdown">
+        <option value="">Select Subject</option>
+        {% for subject in available_subjects %}
+            <option value="{{ subject }}">{{ subject }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Chapter Dropdown -->
+    <select id="chapter-dropdown" disabled>
+        <option value="">Select Chapter</option>
+    </select>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container"></div>
+
+    <!-- Scorecard -->
+    <div class="scorecard">
+        <p>Score: <span id="score">0</span><span id="total-questions"></span></p>
+    </div>
+
+    <div class="submitScore">
+        <button id="saveScoreBtn">Save</button>
+    </div>
+
+</div>
+    </main>
+
+
+
+    <section class="footer-section">
+        <div class="container" style="padding-bottom:5rem;">
+            <img src="/static/img/star.png" alt="" class="star star-s5">
+            <div class="left-side">
+                <div class="title">
+                    <h1>stay up-to date</h1>
+                    <h2>In all subjects and chapters.</h2>
+                </div>
+            </div>
+            <div class="right-side">
+                <p class="txt">
+                    Master <span>Every Lecture</span>
+                    Where AI transforms<span>audio into knowledge and quizzes</span>
+                    into mastery.
+                </p>
+            </div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="container sides">
+            <div class="left-side">
+                <div class="logo">
+                    <img src="/static/img/Logo.png" class="star" alt="">
+                    <div>EduApp</div>
+                </div>
+
+                <p class="p">
+                    We are based in Mumbai, India.<br>
+                    our motto is -Ai in knowledge <br>
+                    paves the way to excellence.
+                </p>
+            </div>
+            <div class="right-side">
+                <ul class="menu">
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">company</a></li>
+                    <li><a href="#">help</a></li>
+                    <li><a href="#">client</a></li>
+                    <li><a href="#">about</a></li>
+                    <li><a href="#">support</a></li>
+                    <li><a href="#">blog</a></li>
+                    <li><a href="#">services</a></li>
+                    <li><a href="#">jobs</a></li>
+                    <li><a href="#">docs</a></li>
+                    <li><a href="#">news</a></li>
+                    <li><a href="#">privacy policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="left-side">
+                <p> &copy; copyright 2024 . All rights reserved</p>
+            </div>
+            <div class="right-side center">
+                <p>Term and Conditions</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+    var netQues = 0;
+    var netScore = 0;
+
+    function triggerConfetti() {
+        // Call the confetti function
+        confetti();
+    }
+
+    $(document).ready(function() {
+    // Define score variable outside the scope of the change event handlers
+    var score = 0;
+
+    // When subject dropdown changes
+    $("#subject-dropdown").change(function() {
+        var subject = $(this).val();
+        if (subject !== "") {
+            // Enable chapter dropdown
+            $("#chapter-dropdown").prop('disabled', false);
+        } else {
+            // Disable chapter dropdown if no subject selected
+            $("#chapter-dropdown").prop('disabled', true);
+            // Hide quiz container
+            $("#quiz-container").hide();
+        }
+        // Clear previous chapters
+        $("#chapter-dropdown").empty().append('<option value="">Select Chapter</option>');
+
+        // Populate chapter dropdown with relevant chapters
+        var chapters = {{ available_chapters|safe }}[subject];
+        $.each(chapters, function(index, chapter) {
+            $("#chapter-dropdown").append('<option value="' + chapter + '">' + chapter + '</option>');
+        });
+    });
+
+    // When chapter dropdown changes
+    $("#chapter-dropdown").change(function() {
+        var subject = $("#subject-dropdown").val();
+        var chapter = $(this).val();
+        if (chapter !== "") {
+            // Show quiz container
+            $("#quiz-container").show();
+        } else {
+            // Hide quiz container if no chapter selected
+            $("#quiz-container").hide();
+        }
+
+        // Filter quiz questions based on selected subject and chapter
+        var quizQuestions = {{ all_quiz_json|safe }};
+        var filteredQuizQuestions = [];
+        for (var i = 0; i < quizQuestions.length; i++) {
+            if (quizQuestions[i].fields.subject === subject && quizQuestions[i].fields.chapter === chapter) {
+                filteredQuizQuestions.push(quizQuestions[i]);
+            }
+        }
+
+        // Display filtered quiz questions
+        $("#quiz-container").empty();
+        score = 0; // Reset the score for each new set of questions
+        for (var i = 0; i < filteredQuizQuestions.length; i++) {
+            var questionText = filteredQuizQuestions[i].fields.question_text;
+            var answerChoices = filteredQuizQuestions[i].fields.answer_choices.split(', ');
+            var correctAnswer = filteredQuizQuestions[i].fields.correct_answer;
+
+            // Create a new div for the quiz question
+            var quizQuestionDiv = $('<div class="custom-card"></div>');
+
+            // Store the correct answer as a data attribute
+            quizQuestionDiv.data('correct-answer', correctAnswer);
+
+            // Create a new h3 element for the question text
+            var questionTextElement = $('<h3></h3>');
+            questionTextElement.text(questionText);
+
+            // Create a new ul element for the answer choices
+            var answerChoicesElement = $('<ul></ul>');
+
+            // Loop through the answer choices and create a new li element for each one
+            for (var j = 0; j < answerChoices.length; j++) {
+                var answerChoice = answerChoices[j];
+                var answerChoiceElement = $('<li></li>');
+                answerChoiceElement.text(answerChoice);
+
+                // Add the answer choice to the ul element
+                answerChoicesElement.append(answerChoiceElement);
+            }
+
+            // Add the question text and answer choices to the quiz question div
+            quizQuestionDiv.append(questionTextElement);
+            quizQuestionDiv.append(answerChoicesElement);
+
+            // Add the quiz question div to the quiz container
+            $("#quiz-container").append(quizQuestionDiv);
+        }
+
+        // Display the score
+        $("#score").text("Score: " + score + "/" + filteredQuizQuestions.length);
+
+        var totalQuestions = $(".custom-card").length;
+            var answeredQuestions = $(".custom-card.answered").length;
+            if (answeredQuestions === totalQuestions) {
+                // All questions are answered, trigger celebration animation
+                $(".celebration-container").show();
+            }
+    });
+
+    // Event delegation for handling clicks on answer choices
+    $("#quiz-container").on("click", "li", function() {
+
+        var questionDiv = $(this).closest('.custom-card');
+
+        var answerChoice = $(this).text();
+        var correctAnswer = questionDiv.data('correct-answer');
+        var feedbackMessage = $("<p></p>").addClass("feedback");
+
+        console.log(answerChoice)
+        console.log(correctAnswer)
+
+        if ((answerChoice) === (correctAnswer)) {
+            questionDiv.css('background-color', '#dff0d8'); // Correct answer
+            feedbackMessage.text("Answer is correct!").css('color', '#48BA00');
+            score++;
+            netQues++;
+            netScore++;
+            triggerConfetti();
+        } else {
+            questionDiv.css('background-color', '#f2dede'); // Incorrect answer
+            feedbackMessage.text(`Answer is wrong, Correct Answer: ${correctAnswer}`).css("color", "red");
+            netQues++;
+        }
+
+        // Mark the question as answered
+        questionDiv.addClass('answered');
+
+        // Optionally, disable all options for this question
+        questionDiv.find('li').css('pointer-events', 'none');
+
+        // Append the feedback message
+        questionDiv.append(feedbackMessage);
+
+        // Update the score display
+        $("#score").text(score + "/" + $(".custom-card").length);
+
+        // Check if all questions have been answered
+        var totalQuestions = $(".custom-card").length;
+        var answeredQuestions = $(".custom-card.answered").length;
+
+        console.log(`netQues: ${netQues}\n answeredQuestions=${answeredQuestions}, totalQuestions: ${totalQuestions}`)
+        if (answeredQuestions === totalQuestions) {
+            // Show the Save button once all questions have been answered
+            $("#saveScoreBtn").show();
+        }
+
+    });
+
+    // Function to get CSRF token from cookie
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Function to save score
+function saveScore() {
+    var subject = $("#subject-dropdown").val();
+    var chapter = $("#chapter-dropdown").val();
+    // Assuming the score is displayed in an element with ID "score"
+    console.log(`subject:${subject}\nchap:${chapter}\nscore:${netScore}`)
+    // Make sure subject, chapter, and score are available
+    if (subject && chapter) {
+        // Prepare data to send to backend
+        var data = {
+            subject: subject,
+            chapter: chapter,
+            score: netScore
+        };
+
+        // Get CSRF token value from the cookie
+        var csrftoken = getCookie('csrftoken');
+
+        // Send data to backend using AJAX
+        $.ajax({
+            type: "POST",
+            url: "/saveScore", // Replace with the URL mapped to your save_score view
+            data: data,
+            headers: {
+                "X-CSRFToken": csrftoken // Include CSRF token in headers
+            },
+            success: function(response) {
+                // Handle success response from backend
+                window.location.href = '{% url "index" %}';
+            },
+            error: function(xhr, status, error) {
+                // Handle error response from backend
+                console.error("Error saving score:", error);
+            }
+        });
+    } else {
+        console.error("Missing data: Please select subject and chapter before saving the score.");
+    }
+}
+
+    // Function to add Save button
+    function addSaveButton() {
+        // Create the Save button
+        var saveButton = $('<button id="saveScoreBtn" style="display:none;margin-top:20px;" class="btn btn-outline-danger">Save</button>');
+
+        // Add click event listener to Save button
+        saveButton.click(function() {
+            saveScore();
+        });
+
+        // Append the Save button to the submitScore container
+        $(".submitScore").empty().append(saveButton);
+    }
+    addSaveButton();
+
+
+});
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+</body>
+</html>

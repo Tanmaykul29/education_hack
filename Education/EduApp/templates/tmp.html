@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduApp</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+            overflow: auto;
+        }
+        .footer-section {
+            margin-top: auto;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+  <header>
+    <nav class="nav-bar">
+        <div class="logo">
+            <img class="star" src="/static/img/Logo.png" alt="" style="width:25px;">
+            <div style="font-size:25px;"><a href="/" style="font-size:25px;text-decoration:none;color:white">EduApp</a></div>
+        </div>
+        <ul class="menu-items">
+            <li><a href="#" style="text-decoration:none;color:white">about</a></li>
+            <li><a href="#" style="text-decoration:none;color:white">services</a></li>
+            <li><a href="#" style="text-decoration:none;color:white">news</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration:none;color:white">
+                  {{ request.user }} <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                  <li style="color:black"><a href="{% url 'logout' %}" style="color:black;text-decoration:none;padding-left:20px;">Logout</a></li>
+              </ul>
+            </li>
+<!--            <li><a href="{% url 'logout' %}" style="text-decoration:none;color:white">{{request.user}}</a></li>-->
+        </ul>
+    </nav>
+  </header>
+
+  <main style="background-color: white;padding-bottom:5%;padding-top:5%">
+      <div class="flex-container">
+      <div>
+        <div style="max-width: fit-content; margin-left: auto;margin-right:auto">
+          <div >
+            <h1 class="text-center mb-4">Dashboard</h1>
+
+            <!-- Summary Table -->
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Chapter</th>
+                  <th>Average Score</th>
+                  <th>Total Attempts</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in summary_table_data %}
+                <tr>
+                  <td>{{ row.subject }}</td>
+                  <td>{{ row.chapter }}</td>
+                  <td>{{ row.average_score }}</td>
+                  <td>{{ row.total_attempts }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+
+            <!-- Pie Chart -->
+            <div id="piechart_3d" style="width: 900px; height: 500px;"></div>
+            <script>
+              google.charts.load('current', {'packages':['corechart']});
+              google.charts.setOnLoadCallback(drawChart);
+
+              function drawChart() {
+
+                // Set Data
+                const data = google.visualization.arrayToDataTable([
+                  ['Subject', 'Attempts'],
+                  {% for subject, count in pie_chart_no_of_attempts_per_subject.items %}
+                  ['{{ subject }}', {{ count }}],
+                  {% endfor %}
+                ]);
+
+                // Set Options
+                const options = {
+                  title:'Quiz Subjects Distribution',
+                  is3D:true
+                };
+
+                // Draw
+                const chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+                chart.draw(data, options);
+
+              }
+              </script>
+
+            <!-- Line Charts -->
+            {% for subject, subject_data in line_chart_per_subject_data %}
+            <div>
+              <h6 style="text-align:center;margin-top:40px;">Scores for {{subject}}</h6>
+              <canvas id="lineChart{{ forloop.counter }}" style="background-color:white"></canvas>
+            </div>
+
+            <script>
+              console.log(`Line Chart for Subject: {{ subject }}`)
+              var ctxL = document.getElementById("lineChart{{ forloop.counter }}").getContext('2d');
+              var lineChart = new Chart(ctxL, {
+                type: 'line',
+                data: {
+                  labels: [{% for item in subject_data %}"{{ item.0 }}",{% endfor %}],
+                  datasets: [{
+                    label: 'Score',
+                    data: [{% for item in subject_data %}{{ item.1 }},{% endfor %}],
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  title: {
+                    display: true,
+                    text: "Line Chart for Subject: {{ subject }}"
+                  },
+                  scales: {
+                    x: {
+                      grid: {
+                        color: 'black'
+                      }
+                    },
+                    y: {
+                      grid: {
+                        color: 'black'
+                      }
+                    }
+                  }
+                }
+              });
+            </script>
+            {% endfor %}
+
+          </div>
+        </div>
+      </div>
+      </div>
+   </main>
+
+    <section class="footer-section">
+        <div class="container" style="padding-bottom:5rem;">
+            <img src="/static/img/star.png" alt="" class="star star-s5">
+            <div class="left-side">
+                <div class="title">
+                    <h1>stay up-to date</h1>
+                    <h2>In all subjects and chapters.</h2>
+                </div>
+            </div>
+            <div class="right-side">
+                <p class="txt">
+                    Master <span>Every Lecture</span>
+                    Where AI transforms<span>audio into knowledge and quizzes</span>
+                    into mastery.
+                </p>
+            </div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="container sides">
+            <div class="left-side">
+                <div class="logo">
+                    <img src="/static/img/Logo.png" class="star" alt="">
+                    <div>EduApp</div>
+                </div>
+
+                <p class="p">
+                    We are based in Mumbai, India.<br>
+                    our motto is -Ai in knowledge <br>
+                    paves the way to excellence.
+                </p>
+            </div>
+            <div class="right-side">
+                <ul class="menu">
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">company</a></li>
+                    <li><a href="#">help</a></li>
+                    <li><a href="#">client</a></li>
+                    <li><a href="#">about</a></li>
+                    <li><a href="#">support</a></li>
+                    <li><a href="#">blog</a></li>
+                    <li><a href="#">services</a></li>
+                    <li><a href="#">jobs</a></li>
+                    <li><a href="#">docs</a></li>
+                    <li><a href="#">news</a></li>
+                    <li><a href="#">privacy policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="left-side">
+                <p> &copy; copyright 2024 . All rights reserved</p>
+            </div>
+            <div class="right-side center">
+                <p>Term and Conditions</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+</html>

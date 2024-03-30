@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduApp</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+            overflow: auto;
+        }
+        .footer-section {
+            margin-top: auto;
+        }
+
+
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 250px;
+            margin-bottom: 10px;
+        }
+
+        .custom-card {
+            background: linear-gradient(to bottom, #f7f5f5, #e9e9e9);
+            transition: transform .5s;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .custom-card:hover {
+            transform: scale(1.005);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+
+        .custom-card h3 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .custom-card ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .custom-card li {
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="nav-bar">
+            <div class="logo">
+                <img class="star" src="/static/img/Logo.png" alt="" style="width:25px;">
+                <div style="font-size:25px;"><a href="/" style="font-size:25px;text-decoration:none;">EduApp</a></div>
+            </div>
+            <ul class="menu-items">
+                <li><a href="#">about</a></li>
+                <li><a href="#">services</a></li>
+                <li><a href="#">news</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration:none;color:white">
+                      {{ request.user }} <b class="caret"></b>
+                  </a>
+                  <ul class="dropdown-menu">
+                      <li style="color:black"><a href="{% url 'logout' %}" style="color:black;text-decoration:none;padding-left:20px;">Logout</a></li>
+                  </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+    <section class="section-one">
+        <div class="container">
+            <div class="left-side">
+                <div class="title">
+                    <h1>All Notes
+                         <img src="/static/img/star.png" alt="" class="star">
+                          <br> EduApp, where AI turns audio into actionable notes and quizzes</h1>
+                </div>
+
+                <p class="p">
+                    Smarter Study Sessions Await: Dive into EduApp's AI notes and quizzes for smarter, faster learning.
+                </p>
+
+            </div>
+            <div class="right-side pyramid">
+                <img src="/static/img/gold.png" alt="" class="gold glow image">
+            </div>
+        </div>
+    </section>
+
+    <br>
+    <section>
+        <h1>View AI Notes</h1>
+        <h2>Select subjects and chapters.</h2>
+        <div class="container">
+            <select id="subject-dropdown" style="margin-top:10px">
+                <option value="">Select Subject</option>
+                {% for subject in available_subjects %}
+                    <option value="{{ subject }}">{{ subject }}</option>
+                {% endfor %}
+            </select>
+                <!-- Chapter Dropdown -->
+            <select id="chapter-dropdown" style="margin-top:10px;" disabled>
+                <option value="">Select Chapter</option>
+            </select>
+
+        </div>
+
+        <!-- Notes Container -->
+        <div id="notes-container" style="display: none; margin-bottom:10%">
+            <h1 style="color:white;margin-left:30px;margin-bottom:8%">Notes</h1>
+            <div class="custom-card" style="margin:30px">
+                <ul id="notes-list"></ul>
+            </div>
+        </div>
+
+    </section>
+    </main>
+
+
+
+    <section class="footer-section">
+        <div class="container" style="padding-bottom:5rem;">
+            <img src="/static/img/star.png" alt="" class="star star-s5">
+            <div class="left-side">
+                <div class="title">
+                    <h1>stay up-to date</h1>
+                    <h2>In all subjects and chapters.</h2>
+                </div>
+            </div>
+            <div class="right-side">
+                <p class="txt">
+                    Master <span>Every Lecture</span>
+                    Where AI transforms<span>audio into knowledge and quizzes</span>
+                    into mastery.
+                </p>
+            </div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="container sides">
+            <div class="left-side">
+                <div class="logo">
+                    <img src="/static/img/Logo.png" class="star" alt="">
+                    <div>EduApp</div>
+                </div>
+
+                <p class="p">
+                    We are based in Mumbai, India.<br>
+                    our motto is -Ai in knowledge <br>
+                    paves the way to excellence.
+                </p>
+            </div>
+            <div class="right-side">
+                <ul class="menu">
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">company</a></li>
+                    <li><a href="#">help</a></li>
+                    <li><a href="#">client</a></li>
+                    <li><a href="#">about</a></li>
+                    <li><a href="#">support</a></li>
+                    <li><a href="#">blog</a></li>
+                    <li><a href="#">services</a></li>
+                    <li><a href="#">jobs</a></li>
+                    <li><a href="#">docs</a></li>
+                    <li><a href="#">news</a></li>
+                    <li><a href="#">privacy policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="left-side">
+                <p> &copy; copyright 2024 . All rights reserved</p>
+            </div>
+            <div class="right-side center">
+                <p>Term and Conditions</p>
+            </div>
+        </div>
+    </footer>
+
+
+
+<script>
+    $(document).ready(function() {
+        // When subject dropdown changes
+        $("#subject-dropdown").change(function() {
+            var subject = $(this).val();
+            if (subject !== "") {
+                // Enable chapter dropdown
+                $("#chapter-dropdown").prop('disabled', false);
+            } else {
+                // Disable chapter dropdown if no subject selected
+                $("#chapter-dropdown").prop('disabled', true);
+                // Hide notes container
+                $("#notes-container").hide();
+            }
+            // Clear previous chapters
+            $("#chapter-dropdown").empty().append('<option value="">Select Chapter</option>');
+
+            // Populate chapter dropdown with relevant chapters
+            var chapters = {{ available_chapters|safe }}[subject];
+            $.each(chapters, function(index, chapter) {
+                $("#chapter-dropdown").append('<option value="' + chapter + '">' + chapter + '</option>');
+            });
+        });
+
+        // When chapter dropdown changes
+        $("#chapter-dropdown").change(function() {
+            var subject = $("#subject-dropdown").val();
+            var chapter = $(this).val();
+            if (chapter !== "") {
+                // Show notes container
+                $("#notes-container").show();
+            } else {
+                // Hide notes container if no chapter selected
+                $("#notes-container").hide();
+            }
+
+            // Filter notes based on selected subject and chapter
+            var notes = {{ all_notes_json|safe }};
+            var filteredNotes = [];
+            for (var i = 0; i < notes.length; i++) {
+                if (notes[i].fields.subject === subject && notes[i].fields.chapter === chapter) {
+                    filteredNotes.push(notes[i].fields.notes); // Pushing only notes field
+                }
+            }
+
+            // Display filtered notes
+            $("#notes-list").empty();
+            $.each(filteredNotes, function(index, note) {
+                // Replace newline characters with HTML line breaks
+                note = note.replace(/\n/g, '<br>');
+                $("#notes-list").append('<li>' + note + '</li>');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

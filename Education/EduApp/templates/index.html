@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduApp</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Add Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+      <!-- Add jQuery library -->
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+      <!-- Add Popper.js library -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+      <!-- Add Bootstrap JS -->
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <nav class="nav-bar">
+            <div class="logo">
+                <img class="star" src="/static/img/Logo.png" alt="" style="width:25px;">
+                <div style="font-size:25px;"><a href="/" style="font-size:25px;text-decoration:none;">EduApp</a></div>
+            </div>
+            <ul class="menu-items">
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'speech_to_text' %}">Audio</a></li>
+                    <li><a href="{% url 'subject_based_notes' %}">Ai Notes</a></li>
+                    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                {%else%}
+                    <li><a href="{% url 'login' %}">Audio</a></li>
+                    <li><a href="{% url 'login' %}">Ai Notes</a></li>
+                    <li><a href="{% url 'login' %}">Dashboard</a></li>
+                {%endif%}
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration:none;color:white">
+                          {{ request.user }} <b class="caret"></b>
+                      </a>
+                      <ul class="dropdown-menu">
+                          <li style="color:black"><a href="{% url 'logout' %}" style="color:black;text-decoration:none;padding-left:20px;">Logout</a></li>
+                      </ul>
+                    </li>
+                {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+<!--                <li><a href="{% url 'logout' %}">{{request.user}}</a></li>-->
+            </ul>
+        </nav>
+    </header>  
+    
+    <section class="section-one">
+        <div class="container">
+            <div class="left-side">
+                <div class="title">
+                    <h1>Transform Lectures into Knowledge
+                         <img src="/static/img/star.png" alt="" class="star">
+                          <br> EduApp, where AI turns audio into actionable notes and quizzes</h1>
+                </div>
+
+                <p class="p">
+                    Smarter Study Sessions Await: Dive into EduApp's AI notes and quizzes for smarter, faster learning.
+                </p>
+
+                <button><a href="{% url 'speech_to_text' %}">know more</a></button>
+
+            </div>
+            <div class="right-side pyramid">
+                <img src="/static/img/gold.png" alt="" class="gold glow image">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="left-side hand">
+                <img class="gold image" src="/static/img/gold2.png" alt="">
+            </div>
+            <div class="right-side">
+                <img src="/static/img/star.png" class="star star-s2" alt="">
+                <div class="title">
+                    <h1>Lecture to Learn</h1>
+                    <h2>With EduApp, turn listening into learning effortlessly</h2>
+                </div>
+
+                <p class="p">
+                    Let EduApp's AI craft notes and quizzes from your professor's audio
+                </p>
+
+                <div class="line"></div>
+
+                <p class="p">
+                    Effortless Learning, Seamless Quizzing
+                </p>
+                <button><a href="{% url 'subject_based_notes' %}" style="text-decoration:none">see directions</a></button>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="left-side">
+                <div class="title">
+                    <h1>From Lecture Hall to Study Hall</h1>
+                    <h2>An unstoppable duo</h2>
+                </div>
+                <div class="type g-type">
+
+                    <p>Unlock the power of EduApp's AI for efficient learning and testing</p>
+                </div>
+
+                <div class="line line-blue"></div>
+
+                <div class="type s-type">
+                    <p>Ace Every Class</p>
+                    <p>
+                        Let EduApp's AI be your study buddy, generating notes and quizzes on the go.
+                    </p>
+                </div>
+                <div class="line"></div>
+            </div>
+            <div class="right-side rotation">
+                <img class="gold3 image" src="/static/img/gold3.png" alt="">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="left-side">
+                <img src="/static/img/star.png" class="star-s4 star" alt="">
+                <div class="title">
+                    <h1>3 direction</h1>
+                    <h2>Choose your feature</h2>
+                </div>
+            </div>
+            <div class="right-side">
+                <p>
+                    "Smarter Study Sessions Await: Dive into EduApp's AI notes and quizzes for smarter, faster learning."
+                </p>
+
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="card-container">
+
+            <div class="card card-1">
+                <div class="rotation">
+                    <img src="/static/img/card-1.png" style="height:500px" alt="" class="img-card image">
+                </div>
+                <a href="{% url 'speech_to_text' %}" style="text-decoration:none"><div class="color">Record Audio</div></a>
+                <a href="{% url 'speech_to_text' %}" style="text-decoration:none"><span>Elevate Your Study Game: With EduApp, turn listening into learning effortlessly.</span></a>
+            </div>
+
+            <div class="card card-2">
+                <div class="rotation">
+                    <img src="/static/img/card-2.png" style="height:500px" class="img-card image">
+                </div>
+                <a href="{% url 'subject_based_notes' %}" style="text-decoration:none"><div class="color">Generate AI Notes</div></a>
+                <a href="{% url 'subject_based_notes' %}" style="text-decoration:none"><span>Customize your study experience with AI-generated notes</span></a>
+            </div>
+            <div class="card card-3">
+                <div class="rotation">
+                    <img src="/static/img/card-3.png" style="height:500px" alt="" class="img-card image">
+                </div>
+                <a href="{% url 'AI_Quiz' %}" style="text-decoration:none"><div class="color">AI Quiz</div></a>
+                <a href="{% url 'AI_Quiz' %}" style="text-decoration:none"><span>Dive into EduApp's AI quizzes for smarter, faster learning.</span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="footer-section">
+        <div class="container" style="padding-bottom:5rem;">
+            <img src="/static/img/star.png" alt="" class="star star-s5">
+            <div class="left-side">
+                <div class="title">
+                    <h1>stay up-to date</h1>
+                    <h2>In all subjects and chapters.</h2>
+                </div>
+            </div>
+            <div class="right-side">
+                <p class="txt">
+                    Master <span>Every Lecture</span>
+                    Where AI transforms<span>audio into knowledge and quizzes</span>
+                    into mastery.
+                </p>
+            </div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="container sides">
+            <div class="left-side">
+                <div class="logo">
+                    <img src="/static/img/Logo.png" class="star" alt="">
+                    <div>EduApp</div>
+                </div>
+
+                <p class="p">
+                    We are based in Mumbai, India.<br>
+                    our motto is -Ai in knowledge <br>
+                    paves the way to excellence.
+                </p>
+            </div>
+            <div class="right-side">
+                <ul class="menu">
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">company</a></li>
+                    <li><a href="#">help</a></li>
+                    <li><a href="#">client</a></li>
+                    <li><a href="#">about</a></li>
+                    <li><a href="#">support</a></li>
+                    <li><a href="#">blog</a></li>
+                    <li><a href="#">services</a></li>
+                    <li><a href="#">jobs</a></li>
+                    <li><a href="#">docs</a></li>
+                    <li><a href="#">news</a></li>
+                    <li><a href="#">privacy policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="left-side">
+                <p> &copy; copyright 2024 . All rights reserved</p>
+            </div>
+            <div class="right-side center">
+                <p>Term and Conditions</p>
+            </div>
+        </div>
+    </footer>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/ScrollTrigger.min.js" ></script>
+<script src="/static/script.js"></script>
+</html>
